@@ -68,9 +68,12 @@ public class HuespedDAO {
 
 				try (resultSet) {
 					while (resultSet.next()) {
-						resultado.add(new Huesped(resultSet.getInt("ID"), resultSet.getString("NOMBRE"),
-								resultSet.getString("APELLIDO"), resultSet.getDate("FECHANACIMIENTO").toLocalDate(),
-								resultSet.getString("NACIONALIDAD"), resultSet.getString("TELEFONO"),
+						resultado.add(new Huesped(resultSet.getInt("ID"), 
+								resultSet.getString("NOMBRE"),
+								resultSet.getString("APELLIDO"), 
+								resultSet.getDate("FECHANACIMIENTO").toLocalDate(),
+								resultSet.getString("NACIONALIDAD"), 
+								resultSet.getString("TELEFONO"),
 								resultSet.getString("DOCIDENTIDAD")));
 					}
 				}
@@ -83,11 +86,12 @@ public class HuespedDAO {
 	}
 
 	public int modificar(String nombre, String apellido, LocalDate fechaNacimiento, String nacionalidad,
-			String telefono, Integer id) {
+			String telefono, Integer id, String docIdentidad) {
 		try {
 			final PreparedStatement statement = con
 					.prepareStatement("UPDATE HUESPED SET " + " NOMBRE = ?, " + " APELLIDO = ?,"
-							+ " FECHANACIMIENTO = ?," + " NACIONALIDAD = ?," + " TELEFONO = ?" + " WHERE ID = ?");
+							+ " FECHANACIMIENTO = ?," + " NACIONALIDAD = ?," + " TELEFONO = ?" + 
+							" DOCIDENTIDAD = ?" + " WHERE ID = ?");
 
 			try (statement) {
 				statement.setString(1, nombre);
@@ -96,6 +100,7 @@ public class HuespedDAO {
 				statement.setString(4, nacionalidad);
 				statement.setString(5, telefono);
 				statement.setInt(6, id);
+				statement.setString(7, docIdentidad);
 				statement.execute();
 
 				int updateCount = statement.getUpdateCount();
