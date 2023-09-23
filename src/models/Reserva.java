@@ -9,12 +9,12 @@ public class Reserva {
 	private LocalDate fechaEntrada;
 	private LocalDate fechaSalida;
 	private double valor;
-	private FormaPago formapago;
+	private String formapago;
 	
 	public Reserva() {
 	}
 	
-	public Reserva(Integer idCliente,LocalDate fechaEntrada, LocalDate fechaSalida, double valor, FormaPago formapago) {
+	public Reserva(Integer idCliente,LocalDate fechaEntrada, LocalDate fechaSalida, double valor, String formapago) {
 		this.idCliente = idCliente;
 		this.fechaEntrada = fechaEntrada;
 		this.fechaSalida = fechaSalida;
@@ -22,7 +22,7 @@ public class Reserva {
 		this.formapago = formapago;
 	}
 	
-	public Reserva(Integer id,Integer idCliente, LocalDate fechaEntrada, LocalDate fechaSalida, double valor, FormaPago formapago) {
+	public Reserva(Integer id,Integer idCliente, LocalDate fechaEntrada, LocalDate fechaSalida, double valor, String formapago) {
 		this.id = id;
 		this.idCliente = idCliente;
 		this.fechaEntrada = fechaEntrada;
@@ -56,10 +56,10 @@ public class Reserva {
 	public void setValor(double valor) {
 		this.valor = valor;
 	}
-	public FormaPago getFormaPago() {
+	public String getFormaPago() {
 		return formapago;
 	}
-	public void setFormaPago(FormaPago formapago) {
+	public void setFormaPago(String formapago) {
 		this.formapago = formapago;
 	}
 

@@ -11,15 +11,26 @@ import javax.swing.ImageIcon;
 import java.awt.Color;
 import javax.swing.JTextField;
 import com.toedter.calendar.JDateChooser;
+
+import dao.ReservaDAO;
+import dbConection.ConnectionDB;
+import models.Huesped;
+import models.Reserva;
+
 import java.awt.Font;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import java.text.Format;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.Toolkit;
 import java.beans.PropertyChangeListener;
+import java.sql.Connection;
 import java.beans.PropertyChangeEvent;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
@@ -29,6 +40,8 @@ import javax.swing.border.LineBorder;
 @SuppressWarnings("serial")
 public class ReservasView extends JFrame {
 
+	ConnectionDB factory = new ConnectionDB();
+	Connection con = factory.recuperaConexion();
 	private JPanel contentPane;
 	public static JTextField txtValor;
 	public static JDateChooser txtFechaEntrada;
@@ -37,6 +50,12 @@ public class ReservasView extends JFrame {
 	int xMouse, yMouse;
 	private JLabel labelExit;
 	private JLabel labelAtras;
+	private int valorDiario = 120;
+	private ReservaDAO reservaDao = new ReservaDAO(con);
+	
+	
+	//FIXME
+	int idClienteEstatico = 4;
 
 	/**
 	 * Launch the application.
@@ -47,6 +66,7 @@ public class ReservasView extends JFrame {
 				try {
 					ReservasView frame = new ReservasView();
 					frame.setVisible(true);
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -235,11 +255,7 @@ public class ReservasView extends JFrame {
 		labelAtras.setHorizontalAlignment(SwingConstants.CENTER);
 		labelAtras.setFont(new Font("Roboto", Font.PLAIN, 23));
 		
-		JLabel lblSiguiente = new JLabel("SIGUIENTE");
-		lblSiguiente.setHorizontalAlignment(SwingConstants.CENTER);
-		lblSiguiente.setForeground(Color.WHITE);
-		lblSiguiente.setFont(new Font("Roboto", Font.PLAIN, 18));
-		lblSiguiente.setBounds(0, 0, 122, 35);
+		
 		
 		
 		//Campos que guardaremos en la base de datos
@@ -264,7 +280,7 @@ public class ReservasView extends JFrame {
 		txtFechaSalida.setFont(new Font("Roboto", Font.PLAIN, 18));
 		txtFechaSalida.addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent evt) {
-				//Activa el evento, después del usuario seleccionar las fechas se debe calcular el valor de la reserva
+				calcularMontoTotal();
 			}
 		});
 		txtFechaSalida.setDateFormatString("yyyy-MM-dd");
@@ -297,8 +313,13 @@ public class ReservasView extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (ReservasView.txtFechaEntrada.getDate() != null && ReservasView.txtFechaSalida.getDate() != null) {		
-					RegistroHuesped registro = new RegistroHuesped();
-					registro.setVisible(true);
+					//TODO : DEBE DAR EL MENSAJE DE EXITO Y CONTINUAR 
+					Reserva reservaAux = obtenerDatosReserva();
+					reservaDao.guardar(reservaAux);			
+					Exito exito = new Exito();
+					exito.setVisible(true);
+					dispose();
+					
 				} else {
 					JOptionPane.showMessageDialog(null, "Debes llenar todos los campos.");
 				}
@@ -309,9 +330,47 @@ public class ReservasView extends JFrame {
 		btnsiguiente.setBounds(238, 493, 122, 35);
 		panel.add(btnsiguiente);
 		btnsiguiente.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+		
+		JLabel lblSiguiente = new JLabel("FINALIZAR");
+		lblSiguiente.setHorizontalAlignment(SwingConstants.CENTER);
+		lblSiguiente.setForeground(Color.WHITE);
+		lblSiguiente.setFont(new Font("Roboto", Font.PLAIN, 18));
+		lblSiguiente.setBounds(0, 0, 122, 35);
+		btnsiguiente.add(lblSiguiente);
 
 
 	}
+	
+	//FUNCIONES
+	public Reserva obtenerDatosReserva() {
+		Date dateIn = txtFechaEntrada.getDate();
+		Date dateOut = txtFechaSalida.getDate();
+		LocalDate fechaEntrada = dateIn.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		LocalDate fechaSalida = dateOut.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();	
+		double valorPagar = valorDiario * ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
+		Reserva datos = new Reserva(
+				idClienteEstatico,
+				fechaEntrada,
+				fechaSalida,
+				valorPagar,
+				(String) txtFormaPago.getSelectedItem());
+
+		return datos;
+	}
+	
+	public void calcularMontoTotal() {
+		
+		if (ReservasView.txtFechaEntrada.getDate() != null && ReservasView.txtFechaSalida.getDate() != null) {
+		Date dateIn = txtFechaEntrada.getDate();
+		Date dateOut = txtFechaSalida.getDate();
+		LocalDate fechaEntrada = dateIn.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		LocalDate fechaSalida = dateOut.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();	
+		double valorPagar = valorDiario * ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
+		
+		txtValor.setText(Double.toString(valorPagar));
+		}
+	}
+	
 		
 	//Código que permite mover la ventana por la pantalla según la posición de "x" y "y"	
 	 private void headerMousePressed(java.awt.event.MouseEvent evt) {

@@ -129,4 +129,36 @@ public class HuespedDAO {
 		}
 	}
 
+	public boolean validarExitenciaHuesped(String nacionalidad, String nroDocumento) {
+		int resultado = 0;
+		boolean existe = false;
+
+		try {
+			final PreparedStatement statement = con.prepareStatement("SELECT COUNT(*) FROM HUESPED WHERE NACIONALIDAD = ?  AND"
+					+ " DOCIDENTIDAD = ?");
+
+			try (statement) {
+				statement.setString(1, nacionalidad);
+				statement.setString(2, nroDocumento);
+				statement.execute();
+
+				final ResultSet resultSet = statement.getResultSet();
+				if (resultSet.next()) {
+					resultado = resultSet.getInt(1); // Obtiene el valor del primer (y único) resultado
+	            }
+				
+				if(resultado>0) {
+					existe = true;
+				}
+
+				/*try (resultSet) {
+					
+				}*/
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		return existe;
+	} 
+
 }

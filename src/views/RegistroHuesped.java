@@ -7,6 +7,11 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JTextField;
 import java.awt.Color;
 import com.toedter.calendar.JDateChooser;
+
+import dao.HuespedDAO;
+import dbConection.ConnectionDB;
+import models.Huesped;
+
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
@@ -19,7 +24,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.sql.Connection;
 import java.text.Format;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.awt.event.ActionEvent;
 import java.awt.Toolkit;
 import javax.swing.SwingConstants;
@@ -28,16 +37,19 @@ import javax.swing.JSeparator;
 @SuppressWarnings("serial")
 public class RegistroHuesped extends JFrame {
 
+	ConnectionDB factory = new ConnectionDB();
+	Connection con = factory.recuperaConexion();
 	private JPanel contentPane;
 	private JTextField txtNombre;
 	private JTextField txtApellido;
 	private JTextField txtTelefono;
-	private JTextField txtNreserva;
+	private JTextField txtNroDocumento;
 	private JDateChooser txtFechaN;
 	private JComboBox<Format> txtNacionalidad;
 	private JLabel labelExit;
 	private JLabel labelAtras;
 	int xMouse, yMouse;
+	private HuespedDAO huespedDao = new HuespedDAO(con);
 
 	/**
 	 * Launch the application.
@@ -97,8 +109,8 @@ public class RegistroHuesped extends JFrame {
 		btnAtras.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				ReservasView reservas = new ReservasView();
-				reservas.setVisible(true);
+				MenuUsuario menu = new MenuUsuario();
+				menu.setVisible(true);
 				dispose();
 			}
 
@@ -216,19 +228,19 @@ public class RegistroHuesped extends JFrame {
 		lblTitulo.setFont(new Font("Roboto Black", Font.PLAIN, 23));
 		contentPane.add(lblTitulo);
 
-		JLabel lblNumeroReserva = new JLabel("NÚMERO DE RESERVA");
+		JLabel lblNumeroReserva = new JLabel("NRO DOCUMENTO");
 		lblNumeroReserva.setBounds(560, 474, 253, 14);
 		lblNumeroReserva.setForeground(SystemColor.textInactiveText);
 		lblNumeroReserva.setFont(new Font("Roboto Black", Font.PLAIN, 18));
 		contentPane.add(lblNumeroReserva);
 
-		txtNreserva = new JTextField();
-		txtNreserva.setFont(new Font("Roboto", Font.PLAIN, 16));
-		txtNreserva.setBounds(560, 495, 285, 33);
-		txtNreserva.setColumns(10);
-		txtNreserva.setBackground(Color.WHITE);
-		txtNreserva.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-		contentPane.add(txtNreserva);
+		txtNroDocumento = new JTextField();
+		txtNroDocumento.setFont(new Font("Roboto", Font.PLAIN, 16));
+		txtNroDocumento.setBounds(560, 495, 285, 33);
+		txtNroDocumento.setColumns(10);
+		txtNroDocumento.setBackground(Color.WHITE);
+		txtNroDocumento.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+		contentPane.add(txtNroDocumento);
 
 		JSeparator separator_1_2 = new JSeparator();
 		separator_1_2.setBounds(560, 170, 289, 2);
@@ -271,6 +283,22 @@ public class RegistroHuesped extends JFrame {
 		btnguardar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				// TODO: VALIDAR EL CORRECTO GUARDADO Y REDIRIGIR AL REGISTRO DE LA RESERVA
+				Huesped auxHuesped = obtenerDatosHuesped();
+
+				if (!existeHuesped(auxHuesped)) {
+					huespedDao.guardar(auxHuesped);		
+					mensajeInformativo("Huésped registrado con éxito.", "Registro Exitoso");
+					
+					
+					ReservasView reserva = new ReservasView();
+					reserva.setVisible(true);
+					dispose();
+					
+				} else {
+					mensajeInformativo("Huesped previamente registrado", "Información");
+				}
+
 			}
 		});
 		btnguardar.setLayout(null);
@@ -301,9 +329,7 @@ public class RegistroHuesped extends JFrame {
 		panel.add(logo);
 		logo.setIcon(new ImageIcon(RegistroHuesped.class.getResource("/imagenes/Ha-100px.png")));
 
-		JPanel btnexit = new JPanel();
-		btnexit.setBounds(857, 0, 53, 36);
-		contentPane.add(btnexit);
+		JPanel btnexit = new JPanel();	
 		btnexit.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -326,13 +352,49 @@ public class RegistroHuesped extends JFrame {
 		});
 		btnexit.setLayout(null);
 		btnexit.setBackground(Color.white);
-
+		btnexit.setBounds(857, 0, 53, 36);
+		header.add(btnexit);
+		
 		labelExit = new JLabel("X");
-		labelExit.setBounds(0, 0, 53, 36);
-		btnexit.add(labelExit);
+		labelExit.setBounds(0, 0, 53, 36);	
 		labelExit.setHorizontalAlignment(SwingConstants.CENTER);
 		labelExit.setForeground(SystemColor.black);
 		labelExit.setFont(new Font("Roboto", Font.PLAIN, 18));
+		btnexit.add(labelExit);
+	}
+
+	// FUNCIONES
+	public Huesped obtenerDatosHuesped() {
+		Date date = txtFechaN.getDate();
+		LocalDate nacimiento = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		Huesped datos = new Huesped(
+				txtNombre.getText(), 
+				txtApellido.getText(), 
+				nacimiento,
+				(String) txtNacionalidad.getSelectedItem(), 
+				txtTelefono.getText(), 
+				txtNroDocumento.getText());
+
+		return datos;
+	}
+
+	public boolean existeHuesped(Huesped auxHuesped) {
+		return huespedDao.validarExitenciaHuesped(auxHuesped.getNacionalidad(), auxHuesped.getDocIdentidad());
+	}
+	
+	public void mensajeInformativo(String mensaje, String titulo) {
+		JOptionPane.showMessageDialog(this, mensaje, titulo,
+				JOptionPane.INFORMATION_MESSAGE);
+	}
+	
+	public void mensajeAdvertencia(String mensaje, String titulo) {
+		JOptionPane.showMessageDialog(this, mensaje, titulo,
+				JOptionPane.WARNING_MESSAGE);
+	}
+	
+	public void mensajeError(String mensaje, String titulo) {
+		JOptionPane.showMessageDialog(this, mensaje, titulo,
+				JOptionPane.ERROR_MESSAGE);
 	}
 
 	// Código que permite mover la ventana por la pantalla según la posición de "x"

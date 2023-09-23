@@ -33,7 +33,7 @@ public class ReservaDAO {
 				statement.setDate(2, Date.valueOf(reserva.getFechaEntrada()));
 				statement.setDate(3, Date.valueOf(reserva.getFechaSalida()));
 				statement.setDouble(4, reserva.getValor());
-				statement.setString(5, reserva.getFormaPago().name());
+				statement.setString(5, reserva.getFormaPago());
 
 				statement.execute();
 
@@ -65,14 +65,16 @@ public class ReservaDAO {
 				final ResultSet resultSet = statement.getResultSet();
 
 				try (resultSet) {
+					
 					while (resultSet.next()) {
+						
 						resultado.add(new Reserva(
 								resultSet.getInt("ID"),
 								resultSet.getInt("IDCLIENTE"),
 								resultSet.getDate("FECHAENTRADA").toLocalDate(),
 								resultSet.getDate("FECHASALIDA").toLocalDate(), 
 								resultSet.getDouble("VALOR"),
-								FormaPago.valueOf(resultSet.getString("FORMAPAGO"))));
+								resultSet.getString("FORMAPAGO")));
 					}
 				}
 			}
@@ -84,7 +86,7 @@ public class ReservaDAO {
 	}
 
 	public int modificar(Integer idCliente, LocalDate fechaEntrada, LocalDate fechaSalida, double valor,
-			FormaPago formapago, Integer id) {
+			String formapago, Integer id) {
 		try {
 			final PreparedStatement statement = con.prepareStatement("UPDATE RESERVA SET " + " IDCLIENTE = ?, "
 					+ " FECHAENTRADA = ?," + " FECHASALIDA = ?," + " VALOR = ?," + "FORMAPAGO = ?" + " WHERE ID = ?");
@@ -94,7 +96,7 @@ public class ReservaDAO {
 				statement.setDate(2, Date.valueOf(fechaEntrada));
 				statement.setDate(3, Date.valueOf(fechaSalida));
 				statement.setDouble(4, valor);
-				statement.setString(5, formapago.name());
+				statement.setString(5, formapago);
 				statement.setInt(6, id);
 				statement.execute();
 
