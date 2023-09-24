@@ -289,7 +289,7 @@ public class RegistroHuesped extends JFrame {
 				if (!existeHuesped(auxHuesped)) {
 					huespedDao.guardar(auxHuesped);		
 					mensajeInformativo("Huésped registrado con éxito.", "Registro Exitoso");
-					
+					System.out.println(auxHuesped.getId());
 					
 					ReservasView reserva = new ReservasView();
 					reserva.setVisible(true);

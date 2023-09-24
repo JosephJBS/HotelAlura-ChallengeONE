@@ -161,4 +161,37 @@ public class HuespedDAO {
 		return existe;
 	} 
 
+	public List<Huesped> busquedaPorDocumento(String nroDocumento) {
+		List<Huesped> resultado = new ArrayList<>();
+
+		try {
+			final PreparedStatement statement = con.prepareStatement("SELECT ID, NOMBRE, APELLIDO,"
+					+ "NACIONALIDAD, TELEFONO , DOCIDENTIDAD FROM HUESPED WHERE DOCIDENTIDAD = ? ");
+			
+
+
+			try (statement) {
+				statement.setString(1,nroDocumento);
+				statement.execute();
+
+				final ResultSet resultSet = statement.getResultSet();
+
+				try (resultSet) {
+					while (resultSet.next()) {
+						resultado.add(new Huesped(
+								resultSet.getInt("ID"),
+								resultSet.getString("DOCIDENTIDAD"),
+								resultSet.getString("NOMBRE"),
+								resultSet.getString("APELLIDO"), 
+								resultSet.getString("NACIONALIDAD"), 
+								resultSet.getString("TELEFONO")));
+					}
+				}
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+
+		return resultado;
+	}
 }

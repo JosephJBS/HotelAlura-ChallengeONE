@@ -55,7 +55,7 @@ public class ReservasView extends JFrame {
 	
 	
 	//FIXME
-	int idClienteEstatico = 4;
+	Integer idClienteEstatico;
 
 	/**
 	 * Launch the application.
@@ -369,6 +369,10 @@ public class ReservasView extends JFrame {
 		
 		txtValor.setText(Double.toString(valorPagar));
 		}
+	}
+	
+	public void obtenerCodigoHuesped(Integer idHuesped) {
+		this.idClienteEstatico = idHuesped;
 	}
 	
 		

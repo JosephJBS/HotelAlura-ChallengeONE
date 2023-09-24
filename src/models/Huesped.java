@@ -14,6 +14,16 @@ public class Huesped {
 
 	public Huesped() {
 	}
+	
+
+	public Huesped(Integer id,String docIdentidad, String nombre, String apellido, String nacionalidad, String telefono) {
+		this.id = id;
+		this.docIdentidad = docIdentidad;
+		this.nombre = nombre;
+		this.apellido = apellido;
+		this.nacionalidad = nacionalidad;
+		this.telefono = telefono;
+	}
 
 	public Huesped(String nombre, String apellido, LocalDate fechaNacimiento, String nacionalidad, String telefono,
 			String docIdentidad) {
