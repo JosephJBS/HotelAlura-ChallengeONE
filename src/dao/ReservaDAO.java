@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import models.FormaPago;
+import models.Huesped;
 import models.Reserva;
 
 public class ReservaDAO {
@@ -124,5 +125,41 @@ public class ReservaDAO {
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public List<Reserva> busquedaPorNroReserva(String nroReserva) {
+		List<Reserva> resultado = new ArrayList<>();
+		int nroReservaSql = Integer.parseInt(nroReserva);
+
+		try {
+			final PreparedStatement statement = 
+					con.prepareStatement("SELECT ID, IDCLIENTE,  FECHAENTRADA, " + "FECHASALIDA,VALOR,FORMAPAGO "
+							+ "FROM RESERVA WHERE ID = ?");
+			
+
+
+			try (statement) {
+				statement.setInt(1,nroReservaSql);
+				statement.execute();
+
+				final ResultSet resultSet = statement.getResultSet();
+
+				try (resultSet) {
+					while (resultSet.next()) {
+						resultado.add(new Reserva(
+								resultSet.getInt("ID"),
+								resultSet.getInt("IDCLIENTE"),
+								resultSet.getDate("FECHAENTRADA").toLocalDate(),
+								resultSet.getDate("FECHASALIDA").toLocalDate(), 
+								resultSet.getDouble("VALOR"),
+								resultSet.getString("FORMAPAGO")));
+					}
+				}
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+
+		return resultado;
 	}
 }

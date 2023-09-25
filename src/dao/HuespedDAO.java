@@ -90,7 +90,7 @@ public class HuespedDAO {
 		try {
 			final PreparedStatement statement = con
 					.prepareStatement("UPDATE HUESPED SET " + " NOMBRE = ?, " + " APELLIDO = ?,"
-							+ " FECHANACIMIENTO = ?," + " NACIONALIDAD = ?," + " TELEFONO = ?" + 
+							+ " FECHANACIMIENTO = ?," + " NACIONALIDAD = ?," + " TELEFONO = ?," + 
 							" DOCIDENTIDAD = ?" + " WHERE ID = ?");
 
 			try (statement) {
@@ -99,8 +99,8 @@ public class HuespedDAO {
 				statement.setDate(3, Date.valueOf(fechaNacimiento));
 				statement.setString(4, nacionalidad);
 				statement.setString(5, telefono);
-				statement.setInt(6, id);
-				statement.setString(7, docIdentidad);
+				statement.setString(6, docIdentidad);
+				statement.setInt(7, id);
 				statement.execute();
 
 				int updateCount = statement.getUpdateCount();
@@ -166,7 +166,7 @@ public class HuespedDAO {
 
 		try {
 			final PreparedStatement statement = con.prepareStatement("SELECT ID, NOMBRE, APELLIDO,"
-					+ "NACIONALIDAD, TELEFONO , DOCIDENTIDAD FROM HUESPED WHERE DOCIDENTIDAD = ? ");
+					+ "NACIONALIDAD, TELEFONO , FECHANACIMIENTO,  DOCIDENTIDAD FROM HUESPED WHERE DOCIDENTIDAD = ? ");
 			
 
 
@@ -179,12 +179,13 @@ public class HuespedDAO {
 				try (resultSet) {
 					while (resultSet.next()) {
 						resultado.add(new Huesped(
-								resultSet.getInt("ID"),
-								resultSet.getString("DOCIDENTIDAD"),
+								resultSet.getInt("ID"), 
 								resultSet.getString("NOMBRE"),
 								resultSet.getString("APELLIDO"), 
+								resultSet.getDate("FECHANACIMIENTO").toLocalDate(),
 								resultSet.getString("NACIONALIDAD"), 
-								resultSet.getString("TELEFONO")));
+								resultSet.getString("TELEFONO"),
+								resultSet.getString("DOCIDENTIDAD")));
 					}
 				}
 			}

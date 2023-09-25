@@ -292,6 +292,7 @@ public class RegistroHuesped extends JFrame {
 					System.out.println(auxHuesped.getId());
 					
 					ReservasView reserva = new ReservasView();
+					reserva.obtenerCodigoHuesped(auxHuesped.getId());
 					reserva.setVisible(true);
 					dispose();
 					

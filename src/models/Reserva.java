@@ -30,8 +30,7 @@ public class Reserva {
 		this.valor = valor;
 		this.formapago = formapago;
 	}
-
-
+	
 	public Integer getId() {
 		return id;
 	}
