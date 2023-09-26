@@ -231,7 +231,7 @@ public class BusquedaHuesped extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 				if (tabla.getSelectedRow() != -1) {
 					idSeleccionado = (Integer) modeloTabla.getValueAt(tabla.getSelectedRow(), 0);
-					System.out.println(idSeleccionado);
+					System.out.println("Se envia Id seleccionado: " + idSeleccionado);
 
 					ReservasView reservas = new ReservasView();
 					reservas.obtenerCodigoHuesped(idSeleccionado);

@@ -14,6 +14,7 @@ import com.toedter.calendar.JDateChooser;
 
 import dao.ReservaDAO;
 import dbConection.ConnectionDB;
+import models.Constantes;
 import models.Reserva;
 
 import java.awt.Font;
@@ -22,6 +23,7 @@ import javax.swing.DefaultComboBoxModel;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.Date;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -47,11 +49,9 @@ public class ReservasView extends JFrame {
 	int xMouse, yMouse;
 	private JLabel labelExit;
 	private JLabel labelAtras;
-	private int valorDiario = 120;
+	private String mensajeCompletarCampos = "";
 	private ReservaDAO reservaDao = new ReservaDAO(con);
-
-	// FIXME
-	Integer idClienteEstatico;
+	private Integer idClienteEstatico;
 
 	/**
 	 * Launch the application.
@@ -300,10 +300,8 @@ public class ReservasView extends JFrame {
 		txtFormaPago.setBounds(68, 417, 289, 38);
 		txtFormaPago.setBackground(SystemColor.text);
 		txtFormaPago.setBorder(new LineBorder(new Color(255, 255, 255), 1, true));
-		txtFormaPago.setFont(new Font("Roboto", Font.PLAIN, 16));
-		
-		txtFormaPago.setModel(new DefaultComboBoxModel<String>(
-				new String[] { "Tarjeta de Crédito", "Tarjeta de Débito", "Dinero en efectivo" }));
+		txtFormaPago.setFont(new Font("Roboto", Font.PLAIN, 16));	
+		txtFormaPago.setModel(new DefaultComboBoxModel<String>(Constantes.FORMAS_PAGO));
 		
 		panel.add(txtFormaPago);
 
@@ -311,8 +309,7 @@ public class ReservasView extends JFrame {
 		btnsiguiente.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (ReservasView.txtFechaEntrada.getDate() != null && ReservasView.txtFechaSalida.getDate() != null) {
-					// TODO : DEBE DAR EL MENSAJE DE EXITO Y CONTINUAR
+				if (validarDatosIngresadosCorrectamente()) {
 					Reserva reservaAux = obtenerDatosReserva();
 					reservaDao.guardar(reservaAux);
 					Exito exito = new Exito();
@@ -320,7 +317,7 @@ public class ReservasView extends JFrame {
 					dispose();
 
 				} else {
-					JOptionPane.showMessageDialog(null, "Debes llenar todos los campos.");
+					JOptionPane.showMessageDialog(null, mensajeCompletarCampos, "Advertencia", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -336,7 +333,6 @@ public class ReservasView extends JFrame {
 		lblSiguiente.setFont(new Font("Roboto", Font.PLAIN, 18));
 		lblSiguiente.setBounds(0, 0, 122, 35);
 		btnsiguiente.add(lblSiguiente);
-
 	}
 
 	// FUNCIONES
@@ -345,8 +341,12 @@ public class ReservasView extends JFrame {
 		Date dateOut = txtFechaSalida.getDate();
 		LocalDate fechaEntrada = dateIn.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 		LocalDate fechaSalida = dateOut.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-		double valorPagar = valorDiario * ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
-		Reserva datos = new Reserva(idClienteEstatico, fechaEntrada, fechaSalida, valorPagar,
+		double valorPagar = Constantes.PAGO_POR_DIA * ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
+		Reserva datos = new Reserva(
+				idClienteEstatico, 
+				fechaEntrada, 
+				fechaSalida, 
+				valorPagar,
 				(String) txtFormaPago.getSelectedItem());
 
 		return datos;
@@ -359,7 +359,7 @@ public class ReservasView extends JFrame {
 			Date dateOut = txtFechaSalida.getDate();
 			LocalDate fechaEntrada = dateIn.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 			LocalDate fechaSalida = dateOut.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-			double valorPagar = valorDiario * ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
+			double valorPagar = Constantes.PAGO_POR_DIA * ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
 
 			txtValor.setText(Double.toString(valorPagar));
 		}
@@ -367,6 +367,39 @@ public class ReservasView extends JFrame {
 
 	public void obtenerCodigoHuesped(Integer idHuesped) {
 		this.idClienteEstatico = idHuesped;
+	}
+	
+	public boolean validarDatosIngresadosCorrectamente() {
+		boolean validacionResultado = true; 
+		String mensajeValidacion = "Corregir: \n";
+		Date fechaSeleccionadaEntrada = txtFechaEntrada.getDate();
+		Date fechaSeleccionadaSalida = txtFechaSalida.getDate();
+		Date fechaActual = new Date();
+		Calendar calendar = Calendar.getInstance();
+		
+        calendar.setTime(fechaActual); 
+        calendar.add(Calendar.DAY_OF_YEAR, -1);
+        Date fechaAyer = calendar.getTime();
+        
+		if (fechaSeleccionadaEntrada == null) {
+			mensajeValidacion += "Campo fecha de check-in vacio \n"; 
+	    }else if (fechaSeleccionadaEntrada.before(fechaAyer)) {
+	    	mensajeValidacion += "Campo fecha de check-in no puede ser dias pasados\n"; 
+	    }
+
+		if (fechaSeleccionadaSalida == null) {
+			mensajeValidacion += "Campo fecha de check-out vacio \n"; 
+	    }else if (fechaSeleccionadaSalida.before(fechaSeleccionadaEntrada)) {
+	    	mensajeValidacion += "Campo fecha de check-out no puede antes de la fecha de check-in";
+	    }
+		
+		if(!mensajeValidacion.equals("Corregir: \n")) {
+			this.mensajeCompletarCampos = mensajeValidacion;
+			System.out.println(mensajeValidacion);		
+			validacionResultado = false;
+		}
+		
+		return validacionResultado;
 	}
 
 	// Código que permite mover la ventana por la pantalla según la posición de "x"

@@ -4,6 +4,10 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import javax.swing.JTextField;
 import java.awt.Color;
 import com.toedter.calendar.JDateChooser;
@@ -47,6 +51,7 @@ public class RegistroHuesped extends JFrame {
 	private JLabel labelAtras;
 	int xMouse, yMouse;
 	private HuespedDAO huespedDao = new HuespedDAO(con);
+	private String mensajeCompletarCampos = " ";
 
 	/**
 	 * Launch the application.
@@ -197,6 +202,7 @@ public class RegistroHuesped extends JFrame {
 		contentPane.add(lblTelefono);
 
 		txtTelefono = new JTextField();
+		allowNumbersOnly(txtTelefono);
 		txtTelefono.setFont(new Font("Roboto", Font.PLAIN, 16));
 		txtTelefono.setBounds(560, 424, 285, 33);
 		txtTelefono.setColumns(10);
@@ -217,6 +223,7 @@ public class RegistroHuesped extends JFrame {
 		contentPane.add(lblNumeroReserva);
 
 		txtNroDocumento = new JTextField();
+		allowNumbersOnly(txtNroDocumento);
 		txtNroDocumento.setFont(new Font("Roboto", Font.PLAIN, 16));
 		txtNroDocumento.setBounds(560, 495, 285, 33);
 		txtNroDocumento.setColumns(10);
@@ -265,22 +272,27 @@ public class RegistroHuesped extends JFrame {
 		btnguardar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Huesped auxHuesped = obtenerDatosHuesped();
+				System.out.println(validarDatosIngresadosCorrectamente()); 
+				
+				if(validarDatosIngresadosCorrectamente()) {
+					Huesped auxHuesped = obtenerDatosHuesped();
+					System.out.println("Se envian bien los datos");
+					if (!existeHuesped(auxHuesped)) {
+						huespedDao.guardar(auxHuesped);
+						mensajeInformativo("Huésped registrado con éxito.", "Registro Exitoso");
+						System.out.println(auxHuesped.getId());
 
-				if (!existeHuesped(auxHuesped)) {
-					huespedDao.guardar(auxHuesped);
-					mensajeInformativo("Huésped registrado con éxito.", "Registro Exitoso");
-					System.out.println(auxHuesped.getId());
+						ReservasView reserva = new ReservasView();
+						reserva.obtenerCodigoHuesped(auxHuesped.getId());
+						reserva.setVisible(true);
+						dispose();
 
-					ReservasView reserva = new ReservasView();
-					reserva.obtenerCodigoHuesped(auxHuesped.getId());
-					reserva.setVisible(true);
-					dispose();
-
-				} else {
-					mensajeInformativo("Huesped previamente registrado", "Información");
+					} else {
+						mensajeInformativo("Huesped previamente registrado", "Información");
+					}
+				}else {
+					mensajeError(mensajeCompletarCampos,"Advertencia");
 				}
-
 			}
 		});
 		btnguardar.setLayout(null);
@@ -349,9 +361,13 @@ public class RegistroHuesped extends JFrame {
 	public Huesped obtenerDatosHuesped() {
 		Date date = txtFechaN.getDate();
 		LocalDate nacimiento = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-		Huesped datos = new Huesped(txtNombre.getText(), txtApellido.getText(), nacimiento,
-				(String) txtNacionalidad.getSelectedItem(), txtTelefono.getText(), txtNroDocumento.getText());
-
+		Huesped datos = new Huesped(
+				txtNombre.getText().trim(), 
+				txtApellido.getText().trim(), 
+				nacimiento,
+				txtNacionalidad.getSelectedItem().toString(), 
+				txtTelefono.getText().trim(), 
+				txtNroDocumento.getText().trim());
 		return datos;
 	}
 
@@ -370,6 +386,69 @@ public class RegistroHuesped extends JFrame {
 	public void mensajeError(String mensaje, String titulo) {
 		JOptionPane.showMessageDialog(this, mensaje, titulo, JOptionPane.ERROR_MESSAGE);
 	}
+	
+	public boolean validarDatosIngresadosCorrectamente() {
+		boolean validacionResultado = true; 
+		Date fechaSeleccionada = txtFechaN.getDate();
+		Date fechaActual = new Date();
+		String mensajeValidacion = "Corregir: \n";
+		
+		if (txtNombre.getText().trim().isEmpty()) {
+			mensajeValidacion += "Campo Nombre vacio \n"; 
+		}
+		
+		if (txtApellido.getText().trim().isEmpty()) {
+			mensajeValidacion += "Campo Apellido vacio \n"; 
+		}
+		
+		if (fechaSeleccionada == null) {
+			mensajeValidacion += "Campo fecha de nacimiento vacio \n"; 
+	    }else if (fechaSeleccionada.after(fechaActual) || fechaSeleccionada.equals(fechaActual)) {
+	    	mensajeValidacion += "Campo fecha de nacimiento no puede ser futura o actual \n"; 
+	    }
+		
+		if (txtTelefono.getText().trim().isEmpty()) {
+			mensajeValidacion += "Campo Telefono vacio\n";
+		}
+		
+		if (txtNroDocumento.getText().trim().isEmpty()) {
+			mensajeValidacion += "Campo Nro Documento vacio \n";
+		}
+		
+		if(!mensajeValidacion.equals("Corregir: \n")) {
+			this.mensajeCompletarCampos = mensajeValidacion;
+			System.out.println(mensajeValidacion);		
+			validacionResultado = false;
+		}
+		
+		return validacionResultado;
+	}
+	
+	public void allowNumbersOnly(JTextField textField) {
+        AbstractDocument document = (AbstractDocument) textField.getDocument();
+        document.setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int offset, String text, AttributeSet attr)
+                    throws BadLocationException {
+                if (containsOnlyNumbers(text)) {
+                    super.insertString(fb, offset, text, attr);
+                }
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+                    throws BadLocationException {
+                if (containsOnlyNumbers(text)) {
+                    super.replace(fb, offset, length, text, attrs);
+                }
+            }
+
+            private boolean containsOnlyNumbers(String text) {
+                return text.matches("^[0-9]*$");
+            }
+        });
+    }
+	
 
 	// Código que permite mover la ventana por la pantalla según la posición de "x"
 	// y "y"

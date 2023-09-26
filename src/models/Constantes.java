@@ -25,4 +25,8 @@ public class Constantes {
 			"suizo-suiza", "tailandés-tailandesa", "taiwanes-taiwanesa", "turco-turca", "ucraniano-ucraniana",
 			"uruguayo-uruguaya", "venezolano-venezolana", "vietnamita-vietnamita" };
 
+	public static final String[] FORMAS_PAGO = { "Tarjeta de Crédito", "Tarjeta de Débito", "Dinero en Efectivo" };
+	
+	public static final int PAGO_POR_DIA = 120;
+
 }
