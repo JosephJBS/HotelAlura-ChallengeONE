@@ -10,6 +10,7 @@ import com.toedter.calendar.JDateChooser;
 
 import dao.HuespedDAO;
 import dbConection.ConnectionDB;
+import models.Constantes;
 import models.Huesped;
 
 import javax.swing.JComboBox;
@@ -18,18 +19,14 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import java.awt.Font;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import java.awt.SystemColor;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.sql.Connection;
-import java.text.Format;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
-import java.awt.event.ActionEvent;
 import java.awt.Toolkit;
 import javax.swing.SwingConstants;
 import javax.swing.JSeparator;
@@ -45,7 +42,7 @@ public class RegistroHuesped extends JFrame {
 	private JTextField txtTelefono;
 	private JTextField txtNroDocumento;
 	private JDateChooser txtFechaN;
-	private JComboBox<Format> txtNacionalidad;
+	private JComboBox<String> txtNacionalidad;
 	private JLabel labelExit;
 	private JLabel labelAtras;
 	int xMouse, yMouse;
@@ -162,26 +159,11 @@ public class RegistroHuesped extends JFrame {
 		txtFechaN.setDateFormatString("yyyy-MM-dd");
 		contentPane.add(txtFechaN);
 
-		txtNacionalidad = new JComboBox();
+		txtNacionalidad = new JComboBox<String>();
 		txtNacionalidad.setBounds(560, 350, 289, 36);
 		txtNacionalidad.setBackground(SystemColor.text);
 		txtNacionalidad.setFont(new Font("Roboto", Font.PLAIN, 16));
-		txtNacionalidad.setModel(new DefaultComboBoxModel(new String[] { "afgano-afgana", "alemán-", "alemana",
-				"árabe-árabe", "argentino-argentina", "australiano-australiana", "belga-belga", "boliviano-boliviana",
-				"brasileño-brasileña", "camboyano-camboyana", "canadiense-canadiense", "chileno-chilena", "chino-china",
-				"colombiano-colombiana", "coreano-coreana", "costarricense-costarricense", "cubano-cubana",
-				"danés-danesa", "ecuatoriano-ecuatoriana", "egipcio-egipcia", "salvadoreño-salvadoreña",
-				"escocés-escocesa", "español-española", "estadounidense-estadounidense", "estonio-estonia",
-				"etiope-etiope", "filipino-filipina", "finlandés-finlandesa", "francés-francesa", "galés-galesa",
-				"griego-griega", "guatemalteco-guatemalteca", "haitiano-haitiana", "holandés-holandesa",
-				"hondureño-hondureña", "indonés-indonesa", "inglés-inglesa", "iraquí-iraquí", "iraní-iraní",
-				"irlandés-irlandesa", "israelí-israelí", "italiano-italiana", "japonés-japonesa", "jordano-jordana",
-				"laosiano-laosiana", "letón-letona", "letonés-letonesa", "malayo-malaya", "marroquí-marroquí",
-				"mexicano-mexicana", "nicaragüense-nicaragüense", "noruego-noruega", "neozelandés-neozelandesa",
-				"panameño-panameña", "paraguayo-paraguaya", "peruano-peruana", "polaco-polaca", "portugués-portuguesa",
-				"puertorriqueño-puertorriqueño", "dominicano-dominicana", "rumano-rumana", "ruso-rusa", "sueco-sueca",
-				"suizo-suiza", "tailandés-tailandesa", "taiwanes-taiwanesa", "turco-turca", "ucraniano-ucraniana",
-				"uruguayo-uruguaya", "venezolano-venezolana", "vietnamita-vietnamita" }));
+		txtNacionalidad.setModel(new DefaultComboBoxModel<String>(Constantes.NACIONALIDADES));
 		contentPane.add(txtNacionalidad);
 
 		JLabel lblNombre = new JLabel("NOMBRE");
@@ -283,19 +265,18 @@ public class RegistroHuesped extends JFrame {
 		btnguardar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO: VALIDAR EL CORRECTO GUARDADO Y REDIRIGIR AL REGISTRO DE LA RESERVA
 				Huesped auxHuesped = obtenerDatosHuesped();
 
 				if (!existeHuesped(auxHuesped)) {
-					huespedDao.guardar(auxHuesped);		
+					huespedDao.guardar(auxHuesped);
 					mensajeInformativo("Huésped registrado con éxito.", "Registro Exitoso");
 					System.out.println(auxHuesped.getId());
-					
+
 					ReservasView reserva = new ReservasView();
 					reserva.obtenerCodigoHuesped(auxHuesped.getId());
 					reserva.setVisible(true);
 					dispose();
-					
+
 				} else {
 					mensajeInformativo("Huesped previamente registrado", "Información");
 				}
@@ -330,7 +311,7 @@ public class RegistroHuesped extends JFrame {
 		panel.add(logo);
 		logo.setIcon(new ImageIcon(RegistroHuesped.class.getResource("/imagenes/Ha-100px.png")));
 
-		JPanel btnexit = new JPanel();	
+		JPanel btnexit = new JPanel();
 		btnexit.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -355,9 +336,9 @@ public class RegistroHuesped extends JFrame {
 		btnexit.setBackground(Color.white);
 		btnexit.setBounds(857, 0, 53, 36);
 		header.add(btnexit);
-		
+
 		labelExit = new JLabel("X");
-		labelExit.setBounds(0, 0, 53, 36);	
+		labelExit.setBounds(0, 0, 53, 36);
 		labelExit.setHorizontalAlignment(SwingConstants.CENTER);
 		labelExit.setForeground(SystemColor.black);
 		labelExit.setFont(new Font("Roboto", Font.PLAIN, 18));
@@ -368,13 +349,8 @@ public class RegistroHuesped extends JFrame {
 	public Huesped obtenerDatosHuesped() {
 		Date date = txtFechaN.getDate();
 		LocalDate nacimiento = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-		Huesped datos = new Huesped(
-				txtNombre.getText(), 
-				txtApellido.getText(), 
-				nacimiento,
-				(String) txtNacionalidad.getSelectedItem(), 
-				txtTelefono.getText(), 
-				txtNroDocumento.getText());
+		Huesped datos = new Huesped(txtNombre.getText(), txtApellido.getText(), nacimiento,
+				(String) txtNacionalidad.getSelectedItem(), txtTelefono.getText(), txtNroDocumento.getText());
 
 		return datos;
 	}
@@ -382,20 +358,17 @@ public class RegistroHuesped extends JFrame {
 	public boolean existeHuesped(Huesped auxHuesped) {
 		return huespedDao.validarExitenciaHuesped(auxHuesped.getNacionalidad(), auxHuesped.getDocIdentidad());
 	}
-	
+
 	public void mensajeInformativo(String mensaje, String titulo) {
-		JOptionPane.showMessageDialog(this, mensaje, titulo,
-				JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(this, mensaje, titulo, JOptionPane.INFORMATION_MESSAGE);
 	}
-	
+
 	public void mensajeAdvertencia(String mensaje, String titulo) {
-		JOptionPane.showMessageDialog(this, mensaje, titulo,
-				JOptionPane.WARNING_MESSAGE);
+		JOptionPane.showMessageDialog(this, mensaje, titulo, JOptionPane.WARNING_MESSAGE);
 	}
-	
+
 	public void mensajeError(String mensaje, String titulo) {
-		JOptionPane.showMessageDialog(this, mensaje, titulo,
-				JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(this, mensaje, titulo, JOptionPane.ERROR_MESSAGE);
 	}
 
 	// Código que permite mover la ventana por la pantalla según la posición de "x"

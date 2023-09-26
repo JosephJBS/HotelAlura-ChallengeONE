@@ -2,6 +2,6 @@ package models;
 
 public enum Rol {
 
-	ADMINISTRADOR,
+	ADMINISTRADOR, 
 	LOCAL_USER,
 }

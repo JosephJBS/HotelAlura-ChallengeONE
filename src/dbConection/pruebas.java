@@ -1,25 +1,8 @@
 package dbConection;
 
-import java.sql.Connection;
+
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.time.LocalDate;
-import java.util.Date;
 
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-
-import dao.HuespedDAO;
-import dao.ReservaDAO;
-import dao.UserDAO;
-import models.FormaPago;
-import models.Huesped;
-import models.Reserva;
 
 public class pruebas {
 
@@ -38,7 +21,7 @@ public class pruebas {
 		
 		//reserva.modificar(4,fecha, fecha, 200.50, FormaPago.EFECTIVO,1);
 		
-		user.Login("admin", "admin");
+		user.authenticate("admin", "admin");
 
 		
 		System.out.println(reserva.listar());*/

@@ -5,7 +5,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
 
 import dao.HuespedDAO;
@@ -14,20 +13,13 @@ import models.Huesped;
 
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import java.awt.Color;
-import java.awt.SystemColor;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import java.awt.Font;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.util.ArrayList;
 import java.util.List;
-import java.awt.event.ActionEvent;
 import javax.swing.JTabbedPane;
 import java.awt.Toolkit;
 import javax.swing.SwingConstants;
@@ -78,7 +70,7 @@ public class BusquedaHuesped extends JFrame {
 	 * Create the frame.
 	 */
 	public BusquedaHuesped() {
-		
+
 		setIconImage(Toolkit.getDefaultToolkit().getImage(BusquedaHuesped.class.getResource("/imagenes/lupa2.png")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 910, 571);
@@ -89,18 +81,8 @@ public class BusquedaHuesped extends JFrame {
 		contentPane.setLayout(null);
 		setLocationRelativeTo(null);
 		setUndecorated(true);
-		
-		txtBuscar = new JTextField();
-		/*
-		 * txtBuscar.addMouseListener(new MouseAdapter() {
-		 * 
-		 * @Override public void mousePressed(MouseEvent e) { if
-		 * (txtBuscar.getText().equals("Ingrese nro de documento")) {
-		 * txtBuscar.setText(""); txtBuscar.setForeground(Color.gray);
-		 * 
-		 * } } });
-		 */
 
+		txtBuscar = new JTextField();
 		txtBuscar.setFont(new Font("Roboto", Font.PLAIN, 14));
 		txtBuscar.setBounds(536, 127, 193, 31);
 		txtBuscar.setBorder(javax.swing.BorderFactory.createEmptyBorder());
@@ -242,24 +224,24 @@ public class BusquedaHuesped extends JFrame {
 		lblBuscar.setHorizontalAlignment(SwingConstants.CENTER);
 		lblBuscar.setForeground(Color.WHITE);
 		lblBuscar.setFont(new Font("Roboto", Font.PLAIN, 18));
-		
-		JPanel btnContinuar= new JPanel();
+
+		JPanel btnContinuar = new JPanel();
 		btnContinuar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (tabla.getSelectedRow() != -1) {
-		            idSeleccionado =  (Integer) modeloTabla.getValueAt(tabla.getSelectedRow(), 0);
-		            System.out.println(idSeleccionado);
-		            
-		            ReservasView reservas = new ReservasView();
-		            reservas.obtenerCodigoHuesped(idSeleccionado);
-		            reservas.setVisible(true);
+					idSeleccionado = (Integer) modeloTabla.getValueAt(tabla.getSelectedRow(), 0);
+					System.out.println(idSeleccionado);
+
+					ReservasView reservas = new ReservasView();
+					reservas.obtenerCodigoHuesped(idSeleccionado);
+					reservas.setVisible(true);
 					dispose();
-		            
-		        } else {
-		        	JOptionPane.showMessageDialog(null, "Seleccione un registro", "Aviso",
+
+				} else {
+					JOptionPane.showMessageDialog(null, "Seleccione un registro", "Aviso",
 							JOptionPane.INFORMATION_MESSAGE);
-		        }
+				}
 
 			}
 		});
@@ -268,7 +250,7 @@ public class BusquedaHuesped extends JFrame {
 		btnContinuar.setBounds(767, 508, 122, 35);
 		btnContinuar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 		contentPane.add(btnContinuar);
-		
+
 		JLabel lblContinuar = new JLabel("Continuar");
 		lblContinuar.setHorizontalAlignment(SwingConstants.CENTER);
 		lblContinuar.setForeground(Color.WHITE);
@@ -303,7 +285,7 @@ public class BusquedaHuesped extends JFrame {
 
 			}
 		});
-		
+
 	}
 
 	public void buscarHuespedPorDocumento(String nroDocumento) {
@@ -321,8 +303,7 @@ public class BusquedaHuesped extends JFrame {
 					huesped.getApellido(), huesped.getNacionalidad(), huesped.getTelefono() });
 		}
 	}
-	
-	
+
 //Código que permite mover la ventana por la pantalla según la posición de "x" y "y"
 	private void headerMousePressed(java.awt.event.MouseEvent evt) {
 		xMouse = evt.getX();
@@ -335,7 +316,4 @@ public class BusquedaHuesped extends JFrame {
 		this.setLocation(x - xMouse, y - yMouse);
 	}
 
-	
-
-	
 }

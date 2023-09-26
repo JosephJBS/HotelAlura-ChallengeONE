@@ -14,9 +14,9 @@ public class Huesped {
 
 	public Huesped() {
 	}
-	
 
-	public Huesped(Integer id,String docIdentidad, String nombre, String apellido, String nacionalidad, String telefono) {
+	public Huesped(Integer id, String docIdentidad, String nombre, String apellido, String nacionalidad,
+			String telefono) {
 		this.id = id;
 		this.docIdentidad = docIdentidad;
 		this.nombre = nombre;

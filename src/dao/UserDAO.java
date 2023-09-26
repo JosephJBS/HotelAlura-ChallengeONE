@@ -5,8 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.mchange.v2.sql.filter.SynchronizedFilterDataSource;
-
 import security.Encrypt;
 
 public class UserDAO {
@@ -19,7 +17,7 @@ public class UserDAO {
 	public boolean Login(String username, String password) {
 		boolean succes = false;
 		int resultado = 0;
-		
+
 		String passwordEncrypt = Encrypt.encryptPassword(password);
 
 		try {
@@ -46,7 +44,5 @@ public class UserDAO {
 
 		return succes;
 	}
-
-
 
 }

@@ -68,12 +68,9 @@ public class HuespedDAO {
 
 				try (resultSet) {
 					while (resultSet.next()) {
-						resultado.add(new Huesped(resultSet.getInt("ID"), 
-								resultSet.getString("NOMBRE"),
-								resultSet.getString("APELLIDO"), 
-								resultSet.getDate("FECHANACIMIENTO").toLocalDate(),
-								resultSet.getString("NACIONALIDAD"), 
-								resultSet.getString("TELEFONO"),
+						resultado.add(new Huesped(resultSet.getInt("ID"), resultSet.getString("NOMBRE"),
+								resultSet.getString("APELLIDO"), resultSet.getDate("FECHANACIMIENTO").toLocalDate(),
+								resultSet.getString("NACIONALIDAD"), resultSet.getString("TELEFONO"),
 								resultSet.getString("DOCIDENTIDAD")));
 					}
 				}
@@ -88,10 +85,9 @@ public class HuespedDAO {
 	public int modificar(String nombre, String apellido, LocalDate fechaNacimiento, String nacionalidad,
 			String telefono, Integer id, String docIdentidad) {
 		try {
-			final PreparedStatement statement = con
-					.prepareStatement("UPDATE HUESPED SET " + " NOMBRE = ?, " + " APELLIDO = ?,"
-							+ " FECHANACIMIENTO = ?," + " NACIONALIDAD = ?," + " TELEFONO = ?," + 
-							" DOCIDENTIDAD = ?" + " WHERE ID = ?");
+			final PreparedStatement statement = con.prepareStatement(
+					"UPDATE HUESPED SET " + " NOMBRE = ?, " + " APELLIDO = ?," + " FECHANACIMIENTO = ?,"
+							+ " NACIONALIDAD = ?," + " TELEFONO = ?," + " DOCIDENTIDAD = ?" + " WHERE ID = ?");
 
 			try (statement) {
 				statement.setString(1, nombre);
@@ -134,8 +130,8 @@ public class HuespedDAO {
 		boolean existe = false;
 
 		try {
-			final PreparedStatement statement = con.prepareStatement("SELECT COUNT(*) FROM HUESPED WHERE NACIONALIDAD = ?  AND"
-					+ " DOCIDENTIDAD = ?");
+			final PreparedStatement statement = con
+					.prepareStatement("SELECT COUNT(*) FROM HUESPED WHERE NACIONALIDAD = ?  AND" + " DOCIDENTIDAD = ?");
 
 			try (statement) {
 				statement.setString(1, nacionalidad);
@@ -145,21 +141,17 @@ public class HuespedDAO {
 				final ResultSet resultSet = statement.getResultSet();
 				if (resultSet.next()) {
 					resultado = resultSet.getInt(1); // Obtiene el valor del primer (y único) resultado
-	            }
-				
-				if(resultado>0) {
-					existe = true;
 				}
 
-				/*try (resultSet) {
-					
-				}*/
+				if (resultado > 0) {
+					existe = true;
+				}
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
 		return existe;
-	} 
+	}
 
 	public List<Huesped> busquedaPorDocumento(String nroDocumento) {
 		List<Huesped> resultado = new ArrayList<>();
@@ -167,24 +159,18 @@ public class HuespedDAO {
 		try {
 			final PreparedStatement statement = con.prepareStatement("SELECT ID, NOMBRE, APELLIDO,"
 					+ "NACIONALIDAD, TELEFONO , FECHANACIMIENTO,  DOCIDENTIDAD FROM HUESPED WHERE DOCIDENTIDAD = ? ");
-			
-
 
 			try (statement) {
-				statement.setString(1,nroDocumento);
+				statement.setString(1, nroDocumento);
 				statement.execute();
 
 				final ResultSet resultSet = statement.getResultSet();
 
 				try (resultSet) {
 					while (resultSet.next()) {
-						resultado.add(new Huesped(
-								resultSet.getInt("ID"), 
-								resultSet.getString("NOMBRE"),
-								resultSet.getString("APELLIDO"), 
-								resultSet.getDate("FECHANACIMIENTO").toLocalDate(),
-								resultSet.getString("NACIONALIDAD"), 
-								resultSet.getString("TELEFONO"),
+						resultado.add(new Huesped(resultSet.getInt("ID"), resultSet.getString("NOMBRE"),
+								resultSet.getString("APELLIDO"), resultSet.getDate("FECHANACIMIENTO").toLocalDate(),
+								resultSet.getString("NACIONALIDAD"), resultSet.getString("TELEFONO"),
 								resultSet.getString("DOCIDENTIDAD")));
 					}
 				}

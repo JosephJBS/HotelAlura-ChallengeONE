@@ -1,4 +1,5 @@
 package security;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -16,7 +17,7 @@ public class Encrypt {
 	}
 
 	public static boolean checkPassword(String password, String hashedPassword) {
-		String encryptedPassword  = "";
+		String encryptedPassword = "";
 		try {
 			encryptedPassword = encryptPassword(password);
 		} catch (Exception e) {
@@ -24,5 +25,5 @@ public class Encrypt {
 			e.printStackTrace();
 		}
 		return encryptedPassword != null && encryptedPassword.equals(hashedPassword);
-	}		
+	}
 }

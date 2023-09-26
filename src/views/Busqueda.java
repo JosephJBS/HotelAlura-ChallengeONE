@@ -17,17 +17,13 @@ import models.Reserva;
 
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import java.awt.Color;
-import java.awt.SystemColor;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import java.awt.Font;
-import java.awt.event.ActionListener;
 import java.util.List;
-import java.awt.event.ActionEvent;
 import javax.swing.JTabbedPane;
 import java.awt.Toolkit;
 import javax.swing.SwingConstants;
@@ -297,66 +293,57 @@ public class Busqueda extends JFrame {
 		JPanel btnEditar = new JPanel();
 		btnEditar.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {		
+			public void mouseClicked(MouseEvent e) {
 				int posicionActual = posicionTabActual(panel);
-				
-				if (posicionActual == 0) {
-		            int filaSeleccionada = tbReservas.getSelectedRow();
-		            if (filaSeleccionada >= 0) {
-		                int idReservaSeleccionado =  Integer.parseInt( modelo.getValueAt(filaSeleccionada, 0).toString());
-		                int idCliente =  Integer.parseInt( modelo.getValueAt(filaSeleccionada, 5).toString());
-		                String fechaEntradStr =  modelo.getValueAt(filaSeleccionada, 1).toString();
-		                String fechaSalidaStr =  modelo.getValueAt(filaSeleccionada, 2).toString();
-		                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		                LocalDate fechaEntrada = LocalDate.parse(fechaEntradStr, formatter);
-		                LocalDate fechaSalida = LocalDate.parse(fechaSalidaStr, formatter);
-		                
-		                double valorPagar = valorDiario * ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
-		                
-		                /*Integer idCliente, LocalDate fechaEntrada, LocalDate fechaSalida, double valor,
-			String formapago, Integer id*/
-		                
-		                reservaDao.modificar(
-		                		idCliente,
-		                		fechaEntrada,
-		                		fechaSalida,
-		                		valorPagar,
-		                		modelo.getValueAt(filaSeleccionada, 4).toString(),
-		                		idReservaSeleccionado);
-		                
-		                listarReservasRegistradas();
-		                JOptionPane.showMessageDialog(null, "ID de reserva a eliminado: " + idReservaSeleccionado);
-		            } else {
-		                JOptionPane.showMessageDialog(null, "Selecciona una reserva para eliminar.");
-		            }
-		        } else if (posicionActual == 1) {
-		            int filaSeleccionada = tbHuespedes.getSelectedRow();
-		            if (filaSeleccionada >= 0) {
-		            	
-		            	
-		                int idHuespedSeleccionado = (Integer) modeloHuesped.getValueAt(filaSeleccionada, 0);
-		                
-		                String fechaStr =  modeloHuesped.getValueAt(filaSeleccionada, 3).toString();
-		                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		                LocalDate fecha = LocalDate.parse(fechaStr, formatter);
 
-		                
-		                huespedDao.modificar(
-		                		(String)modeloHuesped.getValueAt(filaSeleccionada, 1),
-		                		(String)modeloHuesped.getValueAt(filaSeleccionada, 2),
-		                		fecha,
-		                		(String)modeloHuesped.getValueAt(filaSeleccionada, 4),
-		                		(String)modeloHuesped.getValueAt(filaSeleccionada, 5),
-		                		idHuespedSeleccionado,
-		                		(String)modeloHuesped.getValueAt(filaSeleccionada, 6)
-		                		);
-		               
-		                listarHuespedesRegistrados();
-		                JOptionPane.showMessageDialog(null, "ID de huésped editado: " + idHuespedSeleccionado);
-		            } else {
-		                JOptionPane.showMessageDialog(null, "Selecciona un huésped para editar.");
-		            }
-		        }
+				if (posicionActual == 0) {
+					int filaSeleccionada = tbReservas.getSelectedRow();
+					if (filaSeleccionada >= 0) {
+						int idReservaSeleccionado = Integer.parseInt(modelo.getValueAt(filaSeleccionada, 0).toString());
+						int idCliente = Integer.parseInt(modelo.getValueAt(filaSeleccionada, 5).toString());
+						String fechaEntradStr = modelo.getValueAt(filaSeleccionada, 1).toString();
+						String fechaSalidaStr = modelo.getValueAt(filaSeleccionada, 2).toString();
+						DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+						LocalDate fechaEntrada = LocalDate.parse(fechaEntradStr, formatter);
+						LocalDate fechaSalida = LocalDate.parse(fechaSalidaStr, formatter);
+
+						double valorPagar = valorDiario * ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
+
+						/*
+						 * Integer idCliente, LocalDate fechaEntrada, LocalDate fechaSalida, double
+						 * valor, String formapago, Integer id
+						 */
+
+						reservaDao.modificar(idCliente, fechaEntrada, fechaSalida, valorPagar,
+								modelo.getValueAt(filaSeleccionada, 4).toString(), idReservaSeleccionado);
+
+						listarReservasRegistradas();
+						JOptionPane.showMessageDialog(null, "ID de reserva a eliminado: " + idReservaSeleccionado);
+					} else {
+						JOptionPane.showMessageDialog(null, "Selecciona una reserva para eliminar.");
+					}
+				} else if (posicionActual == 1) {
+					int filaSeleccionada = tbHuespedes.getSelectedRow();
+					if (filaSeleccionada >= 0) {
+
+						int idHuespedSeleccionado = (Integer) modeloHuesped.getValueAt(filaSeleccionada, 0);
+
+						String fechaStr = modeloHuesped.getValueAt(filaSeleccionada, 3).toString();
+						DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+						LocalDate fecha = LocalDate.parse(fechaStr, formatter);
+
+						huespedDao.modificar((String) modeloHuesped.getValueAt(filaSeleccionada, 1),
+								(String) modeloHuesped.getValueAt(filaSeleccionada, 2), fecha,
+								(String) modeloHuesped.getValueAt(filaSeleccionada, 4),
+								(String) modeloHuesped.getValueAt(filaSeleccionada, 5), idHuespedSeleccionado,
+								(String) modeloHuesped.getValueAt(filaSeleccionada, 6));
+
+						listarHuespedesRegistrados();
+						JOptionPane.showMessageDialog(null, "ID de huésped editado: " + idHuespedSeleccionado);
+					} else {
+						JOptionPane.showMessageDialog(null, "Selecciona un huésped para editar.");
+					}
+				}
 			}
 		});
 		btnEditar.setLayout(null);
@@ -375,31 +362,31 @@ public class Busqueda extends JFrame {
 		JPanel btnEliminar = new JPanel();
 		btnEliminar.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {		
+			public void mouseClicked(MouseEvent e) {
 				int posicionActual = posicionTabActual(panel);
-				
+
 				if (posicionActual == 0) {
-		            int filaSeleccionada = tbReservas.getSelectedRow();
-		            if (filaSeleccionada >= 0) {
-		                int idReservaSeleccionado = (Integer) modelo.getValueAt(filaSeleccionada, 0);
-		                reservaDao.eliminar(idReservaSeleccionado);
-		                listarReservasRegistradas();
-		                
-		                System.out.println("ID de reserva a eliminar: " + idReservaSeleccionado);
-		            } else {
-		                JOptionPane.showMessageDialog(null, "Selecciona una reserva para eliminar.");
-		            }
-		        } else if (posicionActual == 1) {
-		            int filaSeleccionada = tbHuespedes.getSelectedRow();
-		            if (filaSeleccionada >= 0) {
-		                int idHuespedSeleccionado = (Integer) modeloHuesped.getValueAt(filaSeleccionada, 0);
-		                huespedDao.eliminar(idHuespedSeleccionado);
-		                listarHuespedesRegistrados();
-		                System.out.println("ID de huésped a eliminar: " + idHuespedSeleccionado);
-		            } else {
-		                JOptionPane.showMessageDialog(null, "Selecciona un huésped para eliminar.");
-		            }
-		        }
+					int filaSeleccionada = tbReservas.getSelectedRow();
+					if (filaSeleccionada >= 0) {
+						int idReservaSeleccionado = (Integer) modelo.getValueAt(filaSeleccionada, 0);
+						reservaDao.eliminar(idReservaSeleccionado);
+						listarReservasRegistradas();
+
+						System.out.println("ID de reserva a eliminar: " + idReservaSeleccionado);
+					} else {
+						JOptionPane.showMessageDialog(null, "Selecciona una reserva para eliminar.");
+					}
+				} else if (posicionActual == 1) {
+					int filaSeleccionada = tbHuespedes.getSelectedRow();
+					if (filaSeleccionada >= 0) {
+						int idHuespedSeleccionado = (Integer) modeloHuesped.getValueAt(filaSeleccionada, 0);
+						huespedDao.eliminar(idHuespedSeleccionado);
+						listarHuespedesRegistrados();
+						System.out.println("ID de huésped a eliminar: " + idHuespedSeleccionado);
+					} else {
+						JOptionPane.showMessageDialog(null, "Selecciona un huésped para eliminar.");
+					}
+				}
 			}
 		});
 		btnEliminar.setLayout(null);

@@ -54,7 +54,7 @@ public class Exito extends JDialog {
 		}
 		{
 			JLabel lblNewLabel_1 = new JLabel("Datos guardados satisfactoriamente");
-			lblNewLabel_1.setForeground(new Color (12, 138, 199));
+			lblNewLabel_1.setForeground(new Color(12, 138, 199));
 			lblNewLabel_1.setFont(new Font("Arial", Font.BOLD, 18));
 			lblNewLabel_1.setBounds(27, 122, 322, 21);
 			contentPanel.add(lblNewLabel_1);
@@ -67,8 +67,8 @@ public class Exito extends JDialog {
 				JButton okButton = new JButton("OK");
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						dispose();//sirve para cerrar la ventana actual
-						MenuUsuario usuario = new MenuUsuario(); 
+						dispose();// sirve para cerrar la ventana actual
+						MenuUsuario usuario = new MenuUsuario();
 						usuario.setVisible(true);
 					}
 				});

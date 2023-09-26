@@ -52,17 +52,17 @@ public class ConsultaHuesped extends JDialog {
 			lblNewLabel.setBounds(123, 11, 100, 100);
 			contentPanel.add(lblNewLabel);
 		}
-		
+
 		{
 			JLabel lblNewLabel_1 = new JLabel("¿Es nuevo el huesped?");
-			lblNewLabel_1.setForeground(new Color (12, 138, 199));
+			lblNewLabel_1.setForeground(new Color(12, 138, 199));
 			lblNewLabel_1.setFont(new Font("Arial", Font.BOLD, 18));
-	        lblNewLabel_1.setHorizontalAlignment(JLabel.CENTER);
+			lblNewLabel_1.setHorizontalAlignment(JLabel.CENTER);
 
 			lblNewLabel_1.setBounds(27, 122, 322, 21);
 			contentPanel.add(lblNewLabel_1);
 		}
-		
+
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -71,8 +71,8 @@ public class ConsultaHuesped extends JDialog {
 				JButton siButton = new JButton("SI");
 				siButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						dispose();//sirve para cerrar la ventana actual
-						RegistroHuesped registroHuesped = new RegistroHuesped(); 
+						dispose();// sirve para cerrar la ventana actual
+						RegistroHuesped registroHuesped = new RegistroHuesped();
 						registroHuesped.setVisible(true);
 					}
 				});
@@ -84,8 +84,8 @@ public class ConsultaHuesped extends JDialog {
 				JButton noButton = new JButton("NO");
 				noButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						dispose();//sirve para cerrar la ventana actual
-						BusquedaHuesped registroHuesped = new BusquedaHuesped(); 
+						dispose();// sirve para cerrar la ventana actual
+						BusquedaHuesped registroHuesped = new BusquedaHuesped();
 						registroHuesped.setVisible(true);
 					}
 				});
