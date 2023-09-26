@@ -1,12 +1,17 @@
-package dbConection;
+package Ejecutar;
 
 
 import java.sql.SQLException;
 
+import views.MenuPrincipal;
 
-public class pruebas {
+
+public class Main {
 
 	public static void main(String[] args) throws SQLException {
+		MenuPrincipal menuPrincipal = new MenuPrincipal();
+		menuPrincipal.setVisible(true);
+		
 		/*ConnectionDB factory = new ConnectionDB();
 		Connection con = factory.recuperaConexion();
 		ReservaDAO reserva = new ReservaDAO (con);

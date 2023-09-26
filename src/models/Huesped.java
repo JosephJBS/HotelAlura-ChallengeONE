@@ -106,7 +106,7 @@ public class Huesped {
 	public String toString() {
 		return "Huesped [id=" + id + ", docIdentidad=" + docIdentidad + ", nombre=" + nombre + ", apellido=" + apellido
 				+ ", fechaNacimiento=" + fechaNacimiento + ", nacionalidad=" + nacionalidad + ", telefono=" + telefono
-				+ "]";
+				+ "] \n";
 	}
 
 }

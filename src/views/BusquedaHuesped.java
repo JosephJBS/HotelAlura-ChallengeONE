@@ -259,7 +259,14 @@ public class BusquedaHuesped extends JFrame {
 		btnContinuar.add(lblContinuar);
 		setResizable(false);
 
-		modeloTabla = new DefaultTableModel();
+		modeloTabla = new DefaultTableModel() {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				// Devuelve false para que todas las celdas no sean editables
+				return false;
+			}
+		};
+
 		modeloTabla.addColumn("id");
 		modeloTabla.addColumn("Nro Documento");
 		modeloTabla.addColumn("Nombre");
@@ -290,17 +297,24 @@ public class BusquedaHuesped extends JFrame {
 
 	public void buscarHuespedPorDocumento(String nroDocumento) {
 		List<Huesped> listaHuespedes = huespedDao.busquedaPorDocumento(nroDocumento);
-		System.out.println(listaHuespedes);
 
 		if (listaHuespedes.isEmpty()) {
-			JOptionPane.showMessageDialog(null, "No se encontraron registros con el nro", "Aviso",
+			JOptionPane.showMessageDialog(null, "No se encontraron registros con el nro: " + nroDocumento, "Aviso",
 					JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 
+		System.out.println("Registros encontrados con el Nro Docmuento: " + nroDocumento + " -> \n" + listaHuespedes);
+
 		for (Huesped huesped : listaHuespedes) {
-			modeloTabla.addRow(new Object[] { huesped.getId(), huesped.getDocIdentidad(), huesped.getNombre(),
-					huesped.getApellido(), huesped.getNacionalidad(), huesped.getTelefono() });
+			modeloTabla.addRow(
+					new Object[] {
+							huesped.getId(), 
+							huesped.getDocIdentidad(), 
+							huesped.getNombre(),
+							huesped.getApellido(), 
+							huesped.getNacionalidad(), 
+							huesped.getTelefono() });
 		}
 	}
 
