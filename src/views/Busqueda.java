@@ -345,7 +345,11 @@ public class Busqueda extends JFrame {
 						double valorPagar = Constantes.PAGO_POR_DIA
 								* ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
 
-						reservaDao.modificar(idCliente, fechaEntrada, fechaSalida, valorPagar,
+						reservaDao.modificar(
+								idCliente, 
+								fechaEntrada, 
+								fechaSalida, 
+								valorPagar,
 								modelo.getValueAt(filaSeleccionada, 4).toString(), idReservaSeleccionado);
 
 						listarReservasRegistradas();
@@ -370,10 +374,13 @@ public class Busqueda extends JFrame {
 						DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 						LocalDate fecha = LocalDate.parse(fechaStr, formatter);
 
-						huespedDao.modificar((String) modeloHuesped.getValueAt(filaSeleccionada, 1),
-								(String) modeloHuesped.getValueAt(filaSeleccionada, 2), fecha,
+						huespedDao.modificar(
+								(String) modeloHuesped.getValueAt(filaSeleccionada, 1),
+								(String) modeloHuesped.getValueAt(filaSeleccionada, 2), 
+								fecha,
 								(String) modeloHuesped.getValueAt(filaSeleccionada, 4),
-								(String) modeloHuesped.getValueAt(filaSeleccionada, 5), idHuespedSeleccionado,
+								(String) modeloHuesped.getValueAt(filaSeleccionada, 5), 
+								idHuespedSeleccionado,
 								(String) modeloHuesped.getValueAt(filaSeleccionada, 6));
 
 						listarHuespedesRegistrados();
@@ -454,9 +461,15 @@ public class Busqueda extends JFrame {
 
 		modeloHuesped.setRowCount(0);
 		for (Huesped huesped : listaHuespedes) {
-			modeloHuesped.addRow(new Object[] { huesped.getId(), huesped.getNombre(), huesped.getApellido(),
-					huesped.getFechaNacimiento(), huesped.getNacionalidad(), huesped.getTelefono(),
-					huesped.getDocIdentidad() });
+			modeloHuesped.addRow(
+					new Object[] { 
+							huesped.getId(), 
+							huesped.getNombre(), 
+							huesped.getApellido(),
+							huesped.getFechaNacimiento(), 
+							huesped.getNacionalidad(), 
+							huesped.getTelefono(),
+							huesped.getDocIdentidad() });
 		}
 	}
 
@@ -474,9 +487,15 @@ public class Busqueda extends JFrame {
 		modeloHuesped.setRowCount(0);
 
 		for (Huesped huesped : listaHuespedes) {
-			modeloHuesped.addRow(new Object[] { huesped.getId(), huesped.getNombre(), huesped.getApellido(),
-					huesped.getFechaNacimiento(), huesped.getNacionalidad(), huesped.getTelefono(),
-					huesped.getDocIdentidad() });
+			modeloHuesped.addRow(
+					new Object[] { 
+							huesped.getId(), 
+							huesped.getNombre(), 
+							huesped.getApellido(),
+							huesped.getFechaNacimiento(), 
+							huesped.getNacionalidad(), 
+							huesped.getTelefono(),
+							huesped.getDocIdentidad() });
 		}
 	}
 
@@ -494,8 +513,14 @@ public class Busqueda extends JFrame {
 		modelo.setRowCount(0);
 
 		for (Reserva reserva : listaReservas) {
-			modelo.addRow(new Object[] { reserva.getId(), reserva.getFechaEntrada(), reserva.getFechaSalida(),
-					reserva.getValor(), reserva.getFormaPago(), reserva.getIdCliente() });
+			modelo.addRow(
+					new Object[] { 
+							reserva.getId(), 
+							reserva.getFechaEntrada(), 
+							reserva.getFechaSalida(),
+							reserva.getValor(), 
+							reserva.getFormaPago(), 
+							reserva.getIdCliente() });
 
 		}
 
@@ -513,8 +538,14 @@ public class Busqueda extends JFrame {
 		modelo.setRowCount(0);
 
 		for (Reserva reserva : listaReservas) {
-			modelo.addRow(new Object[] { reserva.getId(), reserva.getFechaEntrada(), reserva.getFechaSalida(),
-					reserva.getValor(), reserva.getFormaPago(), reserva.getIdCliente() });
+			modelo.addRow(
+					new Object[] { 
+							reserva.getId(), 
+							reserva.getFechaEntrada(), 
+							reserva.getFechaSalida(),
+							reserva.getValor(), 
+							reserva.getFormaPago(), 
+							reserva.getIdCliente() });
 
 		}
 	}
