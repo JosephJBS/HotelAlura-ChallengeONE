@@ -152,6 +152,33 @@ public class HuespedDAO {
 		}
 		return existe;
 	}
+	
+	public boolean validarExitenciaHuespedPorId(int id) {
+		int resultado = 0;
+		boolean existe = false;
+
+		try {
+			final PreparedStatement statement = con
+					.prepareStatement("SELECT COUNT(*) FROM HUESPED WHERE id = ? ");
+
+			try (statement) {
+				statement.setInt(1, id);
+				statement.execute();
+
+				final ResultSet resultSet = statement.getResultSet();
+				if (resultSet.next()) {
+					resultado = resultSet.getInt(1); // Obtiene el valor del primer (y único) resultado
+				}
+
+				if (resultado == 1) {
+					existe = true;
+				}
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		return existe;
+	}
 
 	public List<Huesped> busquedaPorDocumento(String nroDocumento) {
 		List<Huesped> resultado = new ArrayList<>();

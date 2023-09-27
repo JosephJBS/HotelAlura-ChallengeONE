@@ -43,12 +43,7 @@ public class BusquedaHuesped extends JFrame {
 	int xMouse, yMouse;
 	private JTable tabla;
 	private HuespedDAO huespedDao = new HuespedDAO(con);
-	private DefaultTableModel modeloTabla = new DefaultTableModel() {
-		@Override
-		public boolean isCellEditable(int row, int column) {
-			return false;
-		}
-	};
+	private DefaultTableModel modeloTabla = new DefaultTableModel();
 
 	/**
 	 * Launch the application.

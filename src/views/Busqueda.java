@@ -12,17 +12,24 @@ import javax.swing.table.DefaultTableModel;
 import dao.HuespedDAO;
 import dao.ReservaDAO;
 import dbConection.ConnectionDB;
+import models.Constantes;
 import models.Huesped;
 import models.Reserva;
 
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+
 import java.awt.Color;
+import java.awt.Dimension;
+
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import java.awt.Font;
+import java.util.Arrays;
 import java.util.List;
 import javax.swing.JTabbedPane;
 import java.awt.Toolkit;
@@ -35,6 +42,7 @@ import java.awt.event.MouseMotionAdapter;
 import java.sql.Connection;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
 @SuppressWarnings("serial")
@@ -46,14 +54,28 @@ public class Busqueda extends JFrame {
 	private JTextField txtBuscar;
 	private JTable tbHuespedes;
 	private JTable tbReservas;
-	private DefaultTableModel modelo;
-	private DefaultTableModel modeloHuesped;
+	private DefaultTableModel modelo = new DefaultTableModel() {
+		@Override
+		public boolean isCellEditable(int row, int column) {
+			// Devuelve false para que la primera columna no sea editable, mientras que las
+			// demás sí lo sean
+			return column != 0 && column != 3;
+		}
+	};;
+	private DefaultTableModel modeloHuesped = new DefaultTableModel() {
+		@Override
+		public boolean isCellEditable(int row, int column) {
+			// Devuelve false para que la primera columna no sea editable, mientras que las
+			// demás sí lo sean
+			return column != 0 && column != 6;
+		}
+	};;
 	private JLabel labelAtras;
 	private JLabel labelExit;
 	int xMouse, yMouse;
-	private int valorDiario = 120;
 	private HuespedDAO huespedDao = new HuespedDAO(con);
 	private ReservaDAO reservaDao = new ReservaDAO(con);
+	private String mensajeCompletarCampos = "";
 
 	/**
 	 * Launch the application.
@@ -121,9 +143,10 @@ public class Busqueda extends JFrame {
 			}
 		});
 
-		tbReservas = new JTable();
+		tbReservas = new JTable(modelo);
 		tbReservas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tbReservas.setFont(new Font("Roboto", Font.PLAIN, 16));
+
 		modelo = (DefaultTableModel) tbReservas.getModel();
 		modelo.addColumn("Numero de Reserva");
 		modelo.addColumn("Fecha Check In");
@@ -136,9 +159,10 @@ public class Busqueda extends JFrame {
 				null);
 		scroll_table.setVisible(true);
 
-		tbHuespedes = new JTable();
+		tbHuespedes = new JTable(modeloHuesped);
 		tbHuespedes.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tbHuespedes.setFont(new Font("Roboto", Font.PLAIN, 16));
+
 		modeloHuesped = (DefaultTableModel) tbHuespedes.getModel();
 		modeloHuesped.addColumn("Número de Huesped");
 		modeloHuesped.addColumn("Nombre");
@@ -147,6 +171,10 @@ public class Busqueda extends JFrame {
 		modeloHuesped.addColumn("Nacionalidad");
 		modeloHuesped.addColumn("Telefono");
 		modeloHuesped.addColumn("Número de Documento");
+
+		int telefonoColumnIndex = 5; // Cambia esto al índice de la columna de teléfono en tu modelo
+		tbHuespedes.getColumnModel().getColumn(telefonoColumnIndex).setCellEditor(new NumericCellEditor());
+		
 		JScrollPane scroll_tableHuespedes = new JScrollPane(tbHuespedes);
 		panel.addTab("Huéspedes", new ImageIcon(Busqueda.class.getResource("/imagenes/pessoas.png")),
 				scroll_tableHuespedes, null);
@@ -298,7 +326,14 @@ public class Busqueda extends JFrame {
 
 				if (posicionActual == 0) {
 					int filaSeleccionada = tbReservas.getSelectedRow();
+
 					if (filaSeleccionada >= 0) {
+						if (!validarDatosReserva(filaSeleccionada)) {
+							JOptionPane.showMessageDialog(null, mensajeCompletarCampos, "Advertencia",
+									JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+
 						int idReservaSeleccionado = Integer.parseInt(modelo.getValueAt(filaSeleccionada, 0).toString());
 						int idCliente = Integer.parseInt(modelo.getValueAt(filaSeleccionada, 5).toString());
 						String fechaEntradStr = modelo.getValueAt(filaSeleccionada, 1).toString();
@@ -307,24 +342,27 @@ public class Busqueda extends JFrame {
 						LocalDate fechaEntrada = LocalDate.parse(fechaEntradStr, formatter);
 						LocalDate fechaSalida = LocalDate.parse(fechaSalidaStr, formatter);
 
-						double valorPagar = valorDiario * ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
-
-						/*
-						 * Integer idCliente, LocalDate fechaEntrada, LocalDate fechaSalida, double
-						 * valor, String formapago, Integer id
-						 */
+						double valorPagar = Constantes.PAGO_POR_DIA
+								* ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
 
 						reservaDao.modificar(idCliente, fechaEntrada, fechaSalida, valorPagar,
 								modelo.getValueAt(filaSeleccionada, 4).toString(), idReservaSeleccionado);
 
 						listarReservasRegistradas();
-						JOptionPane.showMessageDialog(null, "ID de reserva a eliminado: " + idReservaSeleccionado);
+						JOptionPane.showMessageDialog(null,
+								"Reserva con id: " + idReservaSeleccionado + " ha sido editada con éxito");
 					} else {
 						JOptionPane.showMessageDialog(null, "Selecciona una reserva para eliminar.");
 					}
 				} else if (posicionActual == 1) {
 					int filaSeleccionada = tbHuespedes.getSelectedRow();
 					if (filaSeleccionada >= 0) {
+
+						if (!validarDatosHuesped(filaSeleccionada)) {
+							JOptionPane.showMessageDialog(null, mensajeCompletarCampos, "Advertencia",
+									JOptionPane.ERROR_MESSAGE);
+							return;
+						}
 
 						int idHuespedSeleccionado = (Integer) modeloHuesped.getValueAt(filaSeleccionada, 0);
 
@@ -484,6 +522,173 @@ public class Busqueda extends JFrame {
 	public int posicionTabActual(JTabbedPane panel) {
 		int nroTab = panel.getSelectedIndex();
 		return nroTab;
+	}
+
+	public boolean validarDatosReserva(int filaSeleccionada) {
+		boolean validacionResultado = true;
+		boolean fechaEntradaNotEmpty = true;
+		boolean fechaSalidaNotEmpty = true;
+		boolean fechaEntradaFormatOk = true;
+		boolean fechaSalidaFormatOk = true;
+
+		String mensajeValidacion = "Corregir: \n";
+
+		LocalDate fechaEntrada = LocalDate.now();
+		LocalDate fechaSalida = LocalDate.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+		// SE VALIDA QUE EL CAMPO DE LAS FECHAS NO ESTE VACIO
+		if (modelo.getValueAt(filaSeleccionada, 1).toString().trim().isEmpty()) {
+			mensajeValidacion += "- Campo fecha de Check-in vacio \n";
+			fechaEntradaNotEmpty = false;
+		}
+
+		if (modelo.getValueAt(filaSeleccionada, 2).toString().trim().isEmpty()) {
+			mensajeValidacion += "- Campo fecha de Check-out vacio \n";
+			fechaSalidaNotEmpty = false;
+		}
+
+		// SE VALIDA QUE EL CAMPO DE LAS FECHAS TENGAN EL FORMATO <<yyyy-MM-dd>>
+		if (fechaEntradaNotEmpty) {
+			String fechaEntradaStr = modelo.getValueAt(filaSeleccionada, 1).toString();
+
+			try {
+				fechaEntrada = LocalDate.parse(fechaEntradaStr, formatter);
+			} catch (DateTimeParseException e) {
+				fechaEntradaFormatOk = false;
+				mensajeValidacion += "- Campo fecha de Check-in no tiene el formato yyyy-MM-dd \n";
+			}
+		}
+
+		if (fechaSalidaNotEmpty) {
+			String fechaSalidaStr = modelo.getValueAt(filaSeleccionada, 2).toString();
+
+			try {
+				fechaSalida = LocalDate.parse(fechaSalidaStr, formatter);
+			} catch (DateTimeParseException e) {
+				fechaSalidaFormatOk = false;
+				mensajeValidacion += "- Campo fecha de Check-out no tiene el formato yyyy-MM-dd \n";
+			}
+		}
+
+		// SE VALIDA QUE LA FECHA DE CHECKOUT SEA DESPUES DE LA DE CHECKIN
+		if (fechaEntradaFormatOk && fechaSalidaFormatOk) {
+
+			if (fechaSalida.isBefore(fechaEntrada)) {
+				mensajeValidacion += "- Campo fecha de check-out no puede se anterior de la fecha de check-in";
+			}
+		}
+
+		if (modelo.getValueAt(filaSeleccionada, 4).toString().trim().isEmpty()) {
+			mensajeValidacion += "- Campo Forma Pago vacio \n";
+
+		} else {
+			List<String> listaFormaPago = Arrays.asList(Constantes.FORMAS_PAGO);
+			String formaPago = modelo.getValueAt(filaSeleccionada, 4).toString().trim();
+
+			if (!listaFormaPago.contains(formaPago)) {
+				mensajeValidacion += "- Campo Forma Pago debe tener uno de los siguientes valores: \n" + listaFormaPago
+						+ "\n";
+			}
+		}
+
+		if (modelo.getValueAt(filaSeleccionada, 5).toString().trim().isEmpty()) {
+			mensajeValidacion += "- Campo ID Cliente vacio \n";
+		} else {
+			int idCliente = Integer.parseInt(modelo.getValueAt(filaSeleccionada, 5).toString());
+
+			if (!huespedDao.validarExitenciaHuespedPorId(idCliente)) {
+				mensajeValidacion += "- Huesped con id: " + idCliente + " no existe";
+			}
+
+		}
+
+		if (!mensajeValidacion.equals("Corregir: \n")) {
+			this.mensajeCompletarCampos = mensajeValidacion;
+			System.out.println(mensajeValidacion);
+			validacionResultado = false;
+		}
+
+		return validacionResultado;
+	}
+
+	public boolean validarDatosHuesped(int filaSeleccionada) {
+		boolean validacionResultado = true;
+		boolean fechaNacimientoNotEmpty = true;
+		boolean fechaNacimientoFormatOk = true;
+
+		String mensajeValidacion = "Corregir: \n";
+
+
+		LocalDate fechaNacimiento = LocalDate.now();
+		LocalDate fechaHoy = LocalDate.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+		if (modeloHuesped.getValueAt(filaSeleccionada, 1).toString().trim().isEmpty()) {
+			mensajeValidacion += "- Campo Nombre vacio \n";
+		}
+
+		if (modeloHuesped.getValueAt(filaSeleccionada, 2).toString().trim().isEmpty()) {
+			mensajeValidacion += "- Campo Apellido vacio \n";
+		}
+
+		// SE VALIDA QUE EL CAMPO DE LA FECHA NO ESTE VACIO
+		if (modeloHuesped.getValueAt(filaSeleccionada, 3).toString().trim().isEmpty()) {
+			mensajeValidacion += "- Campo Fecha de Nacimiento vacio \n";
+			fechaNacimientoNotEmpty = false;
+		}
+
+		// SE VALIDA QUE EL CAMPO DE LA FECHA TENGAN EL FORMATO <<yyyy-MM-dd>>
+		if (fechaNacimientoNotEmpty) {
+			String fechaNacimeintoStr = modeloHuesped.getValueAt(filaSeleccionada, 3).toString();
+
+			try {
+				fechaNacimiento = LocalDate.parse(fechaNacimeintoStr, formatter);
+			} catch (DateTimeParseException e) {
+				fechaNacimientoFormatOk = false;
+				mensajeValidacion += "- Campo fecha de Nacimiento no tiene el formato yyyy-MM-dd \n";
+			}
+		}
+
+		if (fechaNacimientoFormatOk) {
+			if (fechaNacimiento.isAfter(fechaHoy)) {
+				mensajeValidacion += "- Campo fecha de Nacimiento no puede ser futura \n";
+			}
+		}
+
+		if (modeloHuesped.getValueAt(filaSeleccionada, 4).toString().trim().isEmpty()) {
+			mensajeValidacion += "- Campo Nacionalidad vacio \n";
+		} else {
+			List<String> listaNacionalidades = Arrays.asList(Constantes.NACIONALIDADES);
+			String listaNacionalidadesStr = String.join("\n", listaNacionalidades);
+			String nacionalidad = modeloHuesped.getValueAt(filaSeleccionada, 4).toString().trim();
+
+			JTextArea textArea = new JTextArea(listaNacionalidadesStr);
+			textArea.setEditable(false);
+			JScrollPane scrollPane = new JScrollPane(textArea);
+
+			scrollPane.setPreferredSize(new Dimension(300, 200));
+
+			JDialog dialog = new JDialog();
+			dialog.setMaximumSize(new Dimension(400, 300));
+
+			if (!listaNacionalidades.contains(nacionalidad)) {
+				JOptionPane.showMessageDialog(dialog, scrollPane, "Nacionalidad validas:", JOptionPane.ERROR_MESSAGE);
+				mensajeValidacion += "- Campo Nacionalidad incorrecto \n";
+			} 
+		}
+
+		if (modeloHuesped.getValueAt(filaSeleccionada, 5).toString().trim().isEmpty()) {
+			mensajeValidacion += "- Campo Telefono vacio \n";
+		}
+
+		if (!mensajeValidacion.equals("Corregir: \n")) {
+			this.mensajeCompletarCampos = mensajeValidacion;
+			System.out.println(mensajeValidacion);
+			validacionResultado = false;
+		}
+
+		return validacionResultado;
 	}
 
 //Código que permite mover la ventana por la pantalla según la posición de "x" y "y"
